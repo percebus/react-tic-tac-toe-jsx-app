@@ -15,8 +15,8 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    name: Build
+  verify:
+    name: Verify
     runs-on: ubuntu-latest
     steps:
       - uses: percebus/github-actions-common/.github/actions/checkout@main
@@ -38,13 +38,13 @@ jobs:
       - name: electron-forge package
         run: npx electron-forge package
 
-  build__matrix:
-    if: github.ref == 'refs/heads/main'
-    needs: build
+  verify__matrix:
+    # if: github.ref == 'refs/heads/main'
+    needs: verify
     strategy:
       max-parallel: 6
       matrix:
-        node: [22, 24]
+        node: [23, 24]
         os:
           - ubuntu-latest
           #         - macOS-latest # FIXME
@@ -65,7 +65,7 @@ jobs:
   electron: # FIXME? takes 8min+
     # if: github.ref == 'refs/heads/main'
     if: false
-    needs: build
+    needs: verify
     runs-on: ubuntu-latest
     steps:
       - uses: percebus/github-actions-common/.github/actions/checkout@main
@@ -93,7 +93,7 @@ jobs:
       #     path: out
 
   codeQL:
-    needs: build
+    needs: verify
     runs-on: ubuntu-latest
     permissions:
       actions: read
