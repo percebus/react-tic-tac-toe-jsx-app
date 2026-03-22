@@ -2,7 +2,6 @@
 
 [![verify](https://github.com/percebus/react-tic-tac-toe-jsx-app/actions/workflows/always.yml/badge.svg)](https://github.com/percebus/react-tic-tac-toe-jsx-app/actions/workflows/always.yml) [![dependency review](https://github.com/percebus/react-tic-tac-toe-jsx-app/actions/workflows/pull_request.yml/badge.svg)](https://github.com/percebus/react-tic-tac-toe-jsx-app/actions/workflows/pull_request.yml)
 
-
 ## History
 
 Followed the ["Tutorial: Intro to React"](https://reactjs.org/tutorial/tutorial.html) tutorial to make this application
@@ -26,7 +25,6 @@ It mainly installs global dependencies
 ### Dependencies
 
 [![dependency review](https://github.com/percebus/react-tic-tac-toe-jsx-app/actions/workflows/pull_request.yml/badge.svg)](https://github.com/percebus/react-tic-tac-toe-jsx-app/actions/workflows/pull_request.yml)
-
 
 ```bash
 $> npm install
@@ -93,7 +91,6 @@ $> npm run electron:forge:make
 #### Windows
 
 ![`win32`](./README/electron/win32.png)
-
 
 #### Run
 

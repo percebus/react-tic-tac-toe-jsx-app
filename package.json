@@ -15,8 +15,11 @@
     "LICENSES": "npm run yarn:licenses:prod",
     "standard": "standard src/**/*.jsx public/**/*.js",
     "standard:fix": "npm run standard -- --fix",
-    "lint": "npm run standard",
-    "format": "npm run standard:fix",
+    "_prettier": "prettier .",
+    "prettier:check": "npm run _prettier -- --check",
+    "prettier:write": "npm run _prettier -- --write",
+    "lint": "npm run standard && npm run prettier:check",
+    "format": "npm run standard:fix && npm run prettier:write",
     "postformat": "npm run lint",
     "prereact": "npm run lint",
     "_react": "react-scripts",
@@ -88,7 +91,8 @@
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^14.2.0",
-    "electron": "^19.0.8"
+    "electron": "^19.0.8",
+    "prettier": "^3.8.1"
   },
   "config": {
     "forge": {
