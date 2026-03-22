@@ -1,40 +1,36 @@
-name: Verification
+name: "[C]ontinuous [I]ntegration"
+
 on:
+  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
+  pull_request:
   push:
-  schedule:
-    - cron: '0 0 * * *'
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v3
-      - name: ls
-        run: ls -la
-
-      - name: setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16.X'
-      - name: setup
-        run: npm run setup:ci --if-present
-      - name: npm install
-        run: npm ci
-      - name: node_modules
-        run: ls -la ./node_modules
-      - name: npm audit
-        run: npm audit
-        continue-on-error: true # XXX?
+      - uses: percebus/github-actions-common/.github/actions/checkout@main
+      - uses: percebus/github-actions-node/.github/actions/setup@main
+      - uses: percebus/github-actions-npm/.github/actions/install@main
 
       - name: lint
         run: npm run lint
 
       - name: react build
         run: npx react-scripts build
-      - name: build.zip
-        uses: actions/upload-artifact@v3
+
+      - uses: percebus/github-actions-common/.github/actions/artifact-upload@main
+        name: build.zip
         with:
           name: build
           path: build
@@ -43,13 +39,13 @@ jobs:
         run: npx electron-forge package
 
 
-  builds:
+  build__matrix:
     if: github.ref == 'refs/heads/main'
     needs: build
     strategy:
       max-parallel: 6
       matrix:
-        node: [16, 18]
+        node: [22, 24]
         os:
           - ubuntu-latest
 #         - macOS-latest # FIXME
@@ -57,45 +53,36 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: Build @ node:${{ matrix.node }}@${{ matrix.os }}
     steps:
-      - name: checkout
-        uses: actions/checkout@v3
-      - name: setup node
-        uses: actions/setup-node@v3
+      - uses: percebus/github-actions-common/.github/actions/checkout@main
+      - uses: percebus/github-actions-node/.github/actions/setup@main
         with:
           node-version: ${{ matrix.node }}
 
-      - name: setup
-        run: npm run setup:ci --if-present
-      - name: npm install
-        run: npm ci
+      - uses: percebus/github-actions-npm/.github/actions/install@main
 
       - name: react build
         run: npm run build
 
 
   electron: # FIXME? takes 8min+
-    if: github.ref == 'refs/heads/main'
+    # if: github.ref == 'refs/heads/main'
+    if: false
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v3
+      - uses: percebus/github-actions-common/.github/actions/checkout@main
 
-      - name: setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - name: setup
-        run: npm run setup:ci --if-present
-      - name: npm install
-        run: npm install
-      - name: build.zip
-        uses: actions/download-artifact@v3
+      - uses: percebus/github-actions-node/.github/actions/setup@main
+        # with:
+        #   node-version: 16
+
+      - uses: percebus/github-actions-npm/.github/actions/install@main
+
+      - uses: percebus/github-actions-common/.github/actions/artifact-download@main
+        name: build.zip
         with:
           name: build
           path: build
-      - name: ls
-        run: ls -la
 
       - name: electron-forge make
         run: npx electron-forge make
@@ -108,9 +95,7 @@ jobs:
 
 
   codeQL:
-#   if: github.ref == 'refs/heads/main' # TODO?
     needs: build
-    runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
@@ -121,19 +106,7 @@ jobs:
       matrix:
         language: ['javascript']
 
-    name: 'CodeQL: ${{ matrix.language }}'
-    steps:
-    - name: checkout
-      uses: actions/checkout@v3
-    - name: setup CodeQL
-      uses: github/codeql-action/init@v2
-      with:
-        languages: ${{ matrix.language }}
-    - name: build.zip
-      uses: actions/download-artifact@v3
-      with:
-        name: build
-        path: build
-
-    - name: CodeQL
-      uses: github/codeql-action/analyze@v2
+    uses: percebus/github-actions-compliance/.github/workflows/codeql_analyze.yml@main
+    name: CodeQL analyze
+    with:
+      language: ${{ matrix.language }}
