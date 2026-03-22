@@ -11,7 +11,6 @@ $> rm -rf src/*
 
 Which is why you'll find many left-overs & unused assets
 
-
 ## `chrome-extension`
 
 ### `manifest.json`
@@ -21,7 +20,6 @@ Since there was already a `manifest.json` there, this later was renamed as `mani
 ### React Routing
 
 Since we were not able to use [`react-router(-dom)`](https://github.com/remix-run/react-router), React's defacto's routing library; we had to resort to [`react-chrome-extension-router`](https://github.com/kelsonpw/react-chrome-extension-router).
-
 
 ## `electron`
 
