@@ -39,7 +39,7 @@ jobs:
         run: npx electron-forge package
 
   verify__matrix:
-    # if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     needs: verify
     strategy:
       max-parallel: 6
@@ -47,7 +47,7 @@ jobs:
         node: [23, 24]
         os:
           - ubuntu-latest
-          #         - macOS-latest # FIXME
+          # - macOS-latest # FIXME
           - windows-latest
     runs-on: ${{ matrix.os }}
     name: Verify @ node:${{ matrix.node }}@${{ matrix.os }}
